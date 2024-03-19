@@ -2,12 +2,11 @@ package services
 
 import (
 	"fmt"
+	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-)
-
-var (
-	Movies = make(map[string]string)
+	"github.com/muhammedarifp/tg-movie-bot/models"
+	"github.com/muhammedarifp/tg-movie-bot/repository"
 )
 
 func MovieUpload(bot *tgbotapi.BotAPI, updates *tgbotapi.UpdatesChannel) {
@@ -24,12 +23,14 @@ func MovieUpload(bot *tgbotapi.BotAPI, updates *tgbotapi.UpdatesChannel) {
 
 		if update.ChannelPost.Chat.ID == chanId && update.ChannelPost.Document != nil {
 			doc := update.ChannelPost.Document
-			name := doc.FileName
-			id := doc.FileID
-			Movies[name] = id
-			msg := tgbotapi.NewMessage(chanId, fmt.Sprintf("%s saved !", name))
-			msg.ParseMode = "markdown"
-			bot.Send(msg)
+			data := models.MovieUpload{
+				Name:     doc.FileName,
+				FileID:   doc.FileID,
+				FileSize: int64(doc.FileSize),
+			}
+			if err := repository.UploadMovie(&data); err != nil {
+				log.Println("-- error -- :: ", err.Error())
+			}
 		}
 	}
 }
