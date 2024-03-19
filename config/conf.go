@@ -9,6 +9,7 @@ import (
 
 type Config struct {
 	BotToken string `mapstructure:"BOT_TOKEN"`
+	DbClient string `mapstructure:"DB_CLIENT"`
 }
 
 var (
